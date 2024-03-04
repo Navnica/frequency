@@ -103,10 +103,10 @@ class PlayFrame(QtWidgets.QFrame):
         minutes: int = time_secs // 60
         seconds: int = time_secs % 60
 
-        if minutes < 9:
+        if minutes < 10:
             minutes: str = '0' + str(minutes)
 
-        if seconds < 9:
+        if seconds < 10:
             seconds: str = '0' + str(seconds)
 
         self.all_time_label.setText(f'{minutes}:{seconds}')
@@ -207,10 +207,10 @@ class PlayFrame(QtWidgets.QFrame):
         minutes: int = time_secs // 60
         seconds: int = time_secs % 60
 
-        if minutes < 9:
+        if minutes < 10:
             minutes: str = '0' + str(minutes)
 
-        if seconds < 9:
+        if seconds < 10:
             seconds: str = '0' + str(seconds)
 
         self.current_time_label.setText(f'{minutes}:{seconds}')

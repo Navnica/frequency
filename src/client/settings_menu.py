@@ -3,6 +3,7 @@ import settings
 from src.client.tools.style_setter import set_style_sheet
 from src.client.animated_panel import AnimatedPanel
 from src.client.tools.config_manager import ConfigManager
+from src.client.toggle_button import ToggleButton
 
 
 class SettingsMenu(AnimatedPanel):
@@ -16,11 +17,11 @@ class SettingsMenu(AnimatedPanel):
         set_style_sheet(self, 'settings_menu.qss')
 
         self.general_settings: SettingsMenu.GeneralSettings = SettingsMenu.GeneralSettings()
-        self.deezer_integration: SettingsMenu.DeezerSettings = SettingsMenu.DeezerSettings()
+        self.hitmo_integration: SettingsMenu.HitmoSettings = SettingsMenu.HitmoSettings()
 
         self.main_layout.addWidget(self.general_settings)
         self.main_layout.addItem(QtWidgets.QSpacerItem(0, 5, QtWidgets.QSizePolicy.Policy.Fixed))
-        self.main_layout.addWidget(self.deezer_integration)
+        self.main_layout.addWidget(self.hitmo_integration)
 
         self.save_button: QtWidgets.QPushButton = QtWidgets.QPushButton()
         self.save_button.setObjectName("SaveButton")
@@ -36,12 +37,15 @@ class SettingsMenu(AnimatedPanel):
     def save_settings(self) -> None:
         config: dict = ConfigManager.get_config()
         config['music_dir'] = self.general_settings.music_dir_line_edit.text()
+        config['hitmo_integration_include'] = self.hitmo_integration.toggle_button.isChecked()
         ConfigManager.update_config(config)
         self.parent().reload_panels()
         self.parent().side_menu.on_settings_pressed()
 
     def reload(self) -> None:
-        self.general_settings.music_dir_line_edit.setText(ConfigManager.get_config()['music_dir'])
+        config: dict = ConfigManager.get_config()
+        self.general_settings.music_dir_line_edit.setText(config['music_dir'])
+        self.hitmo_integration.toggle_button.setChecked(config['hitmo_integration_include'])
 
     class SettingsPoint(QtWidgets.QFrame):
         title: str = 'Title'
@@ -58,11 +62,11 @@ class SettingsMenu(AnimatedPanel):
             self.main_layout: QtWidgets.QVBoxLayout = QtWidgets.QVBoxLayout()
             self.title_layout: QtWidgets.QHBoxLayout = QtWidgets.QHBoxLayout()
             self.title_layout.setContentsMargins(0, 0, 0, 0)
-            self.title_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
             self.setLayout(self.main_layout)
             self.main_layout.addLayout(self.title_layout)
             self.setMinimumHeight(50)
-            self.main_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+            self.main_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft)
+            self.title_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft)
 
             self.title_label: QtWidgets.QLabel = QtWidgets.QLabel(self.title)
             self.title_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
@@ -109,13 +113,22 @@ class SettingsMenu(AnimatedPanel):
             )
             self.music_dir_line_edit.setText(music_dir)
 
-    class DeezerSettings(SettingsPoint):
+    class HitmoSettings(SettingsPoint):
         def __init__(self) -> None:
-            super(SettingsMenu.DeezerSettings, self).__init__(
-                title='Deezer-интеграция',
-                pixmap_path=f'{settings.CLIENT_DIR}/img/deezer_title.png'
+            super(SettingsMenu.HitmoSettings, self).__init__(
+                title='Hitmo-интеграция',
+                pixmap_path=f'{settings.CLIENT_DIR}/img/hitmo_title.png'
             )
             self.__init_ui()
 
         def __init_ui(self) -> None:
-            pass
+            self.toggle_button: ToggleButton = ToggleButton(width=40)
+            self.content_layout: QtWidgets.QHBoxLayout = QtWidgets.QHBoxLayout()
+            self.main_layout.addLayout(self.content_layout)
+            self.content_layout.setContentsMargins(0, 0, 0, 0)
+
+            self.content_layout.addWidget(QtWidgets.QLabel('Включить интеграцию'))
+            self.content_layout.addItem(QtWidgets.QSpacerItem(10, 0))
+            self.content_layout.addWidget(self.toggle_button)
+
+

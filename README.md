@@ -6,7 +6,7 @@
 
 
 ## About
-Media player with Deezer integration
+Media player with Hitmo integration
 
 ## Tech
 
@@ -19,7 +19,7 @@ Media player with Deezer integration
 
 ## Features.
 - Playing tracks from a local folder.
-- Integration with Deezer by API-key.
+- Integration with hitmotop.com
 - Cross-platform.
 
 ## Run
