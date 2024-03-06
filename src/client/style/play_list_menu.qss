@@ -70,3 +70,23 @@ QFrame#TrackFrame>QLabel#InfoLabel{
 QFrame#TrackFrame>QLabel#PixmapLabel{
     border-radius: 15px;
 }
+
+QFrame#SearchWidget{
+    background-color: rgb(70, 70, 70);
+    border-radius: 10px;
+}
+
+QFrame#SearchWidget>QLineEdit, QPushButton{
+    background-color: rgb(70, 70, 70);
+    border-radius: 10px;
+    color: white;
+    font-size: 15px;
+}
+
+QFrame#SearchSettings{
+    background-color: rgb(75, 75, 75);
+    border-radius: 15px;
+    color: white;
+}
+
+QLabel{color: white;}

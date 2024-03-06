@@ -65,8 +65,8 @@ class SettingsMenu(AnimatedPanel):
             self.setLayout(self.main_layout)
             self.main_layout.addLayout(self.title_layout)
             self.setMinimumHeight(50)
-            self.main_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft)
-            self.title_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft)
+            self.main_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+            self.title_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
 
             self.title_label: QtWidgets.QLabel = QtWidgets.QLabel(self.title)
             self.title_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
