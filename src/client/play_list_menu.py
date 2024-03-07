@@ -82,6 +82,19 @@ class PlayListMenu(AnimatedPanel):
     def set_music_dir(self) -> None:
         self.parent().side_menu.on_settings_pressed()
 
+    def clear_tracks(self) -> None:
+        for track in self.tracks:
+            track.close()
+
+        self.tracks.clear()
+
+    def load_track(self, track: eyed3.AudioFile) -> None:
+        new_track_frame: PlayListMenu.TrackFrame = PlayListMenu.TrackFrame(track=track)
+
+        self.scroll_layout.addWidget(new_track_frame)
+        new_track_frame.size_expand()
+        self.tracks.append(new_track_frame)
+
     def load_music(self) -> None:
         files: list = get_tracks_in_music_dir(True)
 
@@ -90,12 +103,10 @@ class PlayListMenu(AnimatedPanel):
             self.set_notification('Тут как-то тихо..')
             return
 
-        for track in files:
-            new_track_frame: PlayListMenu.TrackFrame = PlayListMenu.TrackFrame(track=track)
+        self.tracks.clear()
 
-            self.scroll_layout.addWidget(new_track_frame)
-            new_track_frame.size_expand()
-            self.tracks.append(new_track_frame)
+        for track in files:
+            self.load_track(track)
 
     def size_expand(self) -> None:
         self.resize(self.parent().width() - 20, self.parent().height() - 70)
@@ -161,6 +172,9 @@ class PlayListMenu(AnimatedPanel):
             self.timer: QtCore.QTimer = QtCore.QTimer(self)
             self.timer.timeout.connect(self.search_settings.hide)
 
+            self.edit_timer: QtCore.QTimer = QtCore.QTimer(self)
+            self.edit_timer.timeout.connect(self.on_search_line_edit_changed_end)
+
         def on_toggle_button_pressed(self, toggle_button: ToggleButton) -> None:
             if not ConfigManager.get_config()['hitmo_integration_include']:
                 self.hitmo_search_toggle_button.setChecked(False)
@@ -170,8 +184,21 @@ class PlayListMenu(AnimatedPanel):
                     ),
                     'Сначала необходимо включить интеграцию в настройках')
 
+        def on_search_line_edit_changed_end(self) -> None:
+            self.edit_timer.stop()
+            self.parent().clear_tracks()
+
+            if self.search_line_edit.text() == '':
+                self.parent().load_music()
+                return
+
+            for track in get_tracks_in_music_dir():
+                if self.search_line_edit.text().lower() in track.tag.title.lower():
+                    self.parent().load_track(track)
+
         def on_search_line_edit_changed(self) -> None:
-            pass
+            self.edit_timer.stop()
+            self.edit_timer.start(1000)
 
         def search_widget_mouse_enter_event(self, event: QtCore.QEvent) -> None:
             self.timer.stop()
