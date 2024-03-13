@@ -1,4 +1,5 @@
 import eyed3
+import requests
 from PySide6 import QtWidgets, QtCore, QtGui
 import settings
 from src.client.tools.style_setter import set_style_sheet
@@ -7,10 +8,15 @@ from src.client.animated_panel import AnimatedPanel
 from src.client.tools.track_loader import get_tracks_in_music_dir
 from io import BytesIO
 from src.client.toggle_button import ToggleButton
+import threading
+from pars_hitmotop.entered_tracks import EnteredTrack, NoFoundTrack
+import os
+import tempfile
 
 
 class PlayListMenu(AnimatedPanel):
     tracks: list = []
+    temp_file_list: list[str] = []
 
     def __init__(self, parent) -> None:
         super(PlayListMenu, self).__init__(parent)
@@ -88,6 +94,11 @@ class PlayListMenu(AnimatedPanel):
 
         self.tracks.clear()
 
+        for i in reversed(range(self.scroll_layout.count())):
+            item = self.scroll_layout.itemAt(i)
+            if isinstance(item, QtWidgets.QSpacerItem):
+                self.scroll_layout.removeItem(item)
+
     def load_track(self, track: eyed3.AudioFile) -> None:
         new_track_frame: PlayListMenu.TrackFrame = PlayListMenu.TrackFrame(track=track)
 
@@ -114,6 +125,9 @@ class PlayListMenu(AnimatedPanel):
             track.size_expand()
 
     class SearchWidget(QtWidgets.QFrame):
+        required_track: str = ''
+        track_added_signal: QtCore.Signal = QtCore.Signal(eyed3.AudioFile)
+
         def __init__(self) -> None:
             super(PlayListMenu.SearchWidget, self).__init__()
             self.__init_ui()
@@ -175,6 +189,12 @@ class PlayListMenu(AnimatedPanel):
             self.edit_timer: QtCore.QTimer = QtCore.QTimer(self)
             self.edit_timer.timeout.connect(self.on_search_line_edit_changed_end)
 
+            self.track_added_signal.connect(self.track_add_slot)
+
+        @QtCore.Slot(eyed3.AudioFile)
+        def track_add_slot(self, file: eyed3.AudioFile) -> None:
+            self.parent().load_track(file)
+
         def on_toggle_button_pressed(self, toggle_button: ToggleButton) -> None:
             if not ConfigManager.get_config()['hitmo_integration_include']:
                 self.hitmo_search_toggle_button.setChecked(False)
@@ -192,13 +212,56 @@ class PlayListMenu(AnimatedPanel):
                 self.parent().load_music()
                 return
 
+            label_section: PlayListMenu.LabelSection = PlayListMenu.LabelSection(title='Локальный поиск')
+            self.parent().tracks.append(label_section)
+            self.parent().scroll_layout.addWidget(label_section)
+            self.parent().scroll_layout.addItem(QtWidgets.QSpacerItem(0, 5))
+
             for track in get_tracks_in_music_dir():
                 if self.search_line_edit.text().lower() in track.tag.title.lower():
                     self.parent().load_track(track)
 
+            if not self.hitmo_search_toggle_button.isChecked():
+                return
+
+            self.parent().scroll_layout.addItem(QtWidgets.QSpacerItem(0, 5))
+            label_section: PlayListMenu.LabelSection = PlayListMenu.LabelSection(title='Hitmo')
+            self.parent().tracks.append(label_section)
+            self.parent().scroll_layout.addWidget(label_section)
+            self.parent().scroll_layout.addItem(QtWidgets.QSpacerItem(0, 5))
+
+            threading.Thread(target=lambda: self.find_tracks_in_hitmo(self.required_track)).start()
+
+        def find_tracks_in_hitmo(self, track_title: str) -> None:
+            try:
+                result: dict[str, str] = EnteredTrack(track_title, 10).get_info['items']
+
+                print(result[0])
+                exit()
+                for track in result:
+                    if self.required_track != track_title:
+                        exit()
+
+                    audio_data = requests.get(track['url_down']).content
+                    temp_fd, temp_filename = tempfile.mkstemp(suffix=".mp3")
+
+                    with os.fdopen(temp_fd, "wb") as temp_file:
+                        temp_file.write(audio_data)
+
+                    audiofile = eyed3.load(temp_filename)
+                    self.parent().temp_file_list.append(audiofile.path)
+                    self.track_added_signal.emit(audiofile)
+
+            except NoFoundTrack:
+                exit()
+
+            except RuntimeError:
+                exit()
+
         def on_search_line_edit_changed(self) -> None:
             self.edit_timer.stop()
             self.edit_timer.start(1000)
+            self.required_track = self.search_line_edit.text()
 
         def search_widget_mouse_enter_event(self, event: QtCore.QEvent) -> None:
             self.timer.stop()
@@ -216,6 +279,29 @@ class PlayListMenu(AnimatedPanel):
 
         def mouse_leave_event(self, event: QtCore.QEvent) -> None:
             self.timer.start(500)
+
+    class LabelSection(QtWidgets.QFrame):
+        def __init__(self, title) -> None:
+            super(PlayListMenu.LabelSection, self).__init__()
+
+            self.title: str = title
+            self.__init_ui()
+
+        def __init_ui(self) -> None:
+            self.setObjectName('LabelSection')
+            self.setFixedHeight(23)
+
+            layout: QtWidgets.QVBoxLayout = QtWidgets.QVBoxLayout()
+            layout.setContentsMargins(0, 0, 0, 0)
+            layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+            label: QtWidgets.QWidget = QtWidgets.QLabel(self.title)
+
+            self.setLayout(layout)
+
+            layout.addWidget(label)
+
+        def size_expand(self) -> None:
+            self.setFixedWidth(self.parent().parent().parent().parent().width() - 20)
 
     class TrackFrame(QtWidgets.QFrame):
         track: eyed3.AudioFile

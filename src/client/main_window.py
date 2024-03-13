@@ -1,3 +1,5 @@
+import os
+
 from PySide6 import QtWidgets, QtCore
 from src.client.settings_menu import SettingsMenu
 from src.client.play_frame import PlayFrame
@@ -40,6 +42,10 @@ class MainWindow(QtWidgets.QWidget):
         self.settings_menu.raise_()
         self.play_list_menu.move(10, 10)
         self.play_list_menu.raise_()
+
+    def closeEvent(self, event) -> None:
+        for temp_file in self.play_list_menu.temp_file_list:
+            os.remove(temp_file)
 
     def reload_panels(self) -> None:
         self.play_list_menu.reload()

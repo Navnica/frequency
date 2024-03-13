@@ -49,9 +49,13 @@ QPushButton#ToSettingsButton::pressed{
     color: white;
 }
 
-QFrame#TrackFrame{
+QFrame#TrackFrame, QFrame#LabelSection{
     background-color: rgb(70, 70, 70);
     border-radius: 7px;
+}
+
+QFrame#LabelSection>QLabel{
+    color: rgb(200, 200, 200);
 }
 
 QFrame#TrackFrame::hover{
@@ -90,3 +94,4 @@ QFrame#SearchSettings{
 }
 
 QLabel{color: white;}
+
