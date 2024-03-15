@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QCheckBox
 from PySide6.QtCore import Qt, QEvent, QRect, QPoint, QEasingCurve, QPropertyAnimation, Property
-from PySide6.QtGui import QPainter, QColor, QPen, QMouseEvent
+from PySide6.QtGui import QPainter, QColor, QPen
 
 
 class ToggleButton(QCheckBox):

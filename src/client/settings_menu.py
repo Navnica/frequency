@@ -37,7 +37,8 @@ class SettingsMenu(AnimatedPanel):
     def save_settings(self) -> None:
         config: dict = ConfigManager.get_config()
         config['music_dir'] = self.general_settings.music_dir_line_edit.text()
-        config['hitmo_integration_include'] = self.hitmo_integration.toggle_button.isChecked()
+        config['hitmo_integration_include'] = self.hitmo_integration.include_hitmo_toggle_button.isChecked()
+        config['download_on_play'] = self.hitmo_integration.download_on_play_toggle_button.isChecked()
         ConfigManager.update_config(config)
         self.parent().reload_panels()
         self.parent().side_menu.on_settings_pressed()
@@ -45,7 +46,8 @@ class SettingsMenu(AnimatedPanel):
     def reload(self) -> None:
         config: dict = ConfigManager.get_config()
         self.general_settings.music_dir_line_edit.setText(config['music_dir'])
-        self.hitmo_integration.toggle_button.setChecked(config['hitmo_integration_include'])
+        self.hitmo_integration.include_hitmo_toggle_button.setChecked(config['hitmo_integration_include'])
+        self.hitmo_integration.download_on_play_toggle_button.setChecked(config['download_on_play'])
 
     class SettingsPoint(QtWidgets.QFrame):
         title: str = 'Title'
@@ -122,13 +124,22 @@ class SettingsMenu(AnimatedPanel):
             self.__init_ui()
 
         def __init_ui(self) -> None:
-            self.toggle_button: ToggleButton = ToggleButton(width=40)
-            self.content_layout: QtWidgets.QHBoxLayout = QtWidgets.QHBoxLayout()
-            self.main_layout.addLayout(self.content_layout)
-            self.content_layout.setContentsMargins(0, 0, 0, 0)
+            self.include_hitmo_toggle_button: ToggleButton = ToggleButton(width=40)
+            self.include_hitmo_layout: QtWidgets.QHBoxLayout = QtWidgets.QHBoxLayout()
+            self.main_layout.addLayout(self.include_hitmo_layout)
+            self.include_hitmo_layout.setContentsMargins(0, 0, 0, 0)
 
-            self.content_layout.addWidget(QtWidgets.QLabel('Включить интеграцию'))
-            self.content_layout.addItem(QtWidgets.QSpacerItem(10, 0))
-            self.content_layout.addWidget(self.toggle_button)
+            self.include_hitmo_layout.addWidget(QtWidgets.QLabel('Включить интеграцию'))
+            self.include_hitmo_layout.addItem(QtWidgets.QSpacerItem(10, 0))
+            self.include_hitmo_layout.addWidget(self.include_hitmo_toggle_button)
 
+            self.download_on_play_layout: QtWidgets.QHBoxLayout = QtWidgets.QHBoxLayout()
+            self.download_on_play_layout.setContentsMargins(0, 0, 0, 0)
+            self.main_layout.addLayout(self.download_on_play_layout)
+            self.download_on_play_toggle_button: ToggleButton = ToggleButton(width=40)
 
+            self.download_on_play_layout.addWidget(QtWidgets.QLabel('Загружать при проигрывании'))
+            self.download_on_play_layout.addItem(QtWidgets.QSpacerItem(10, 0))
+            self.download_on_play_layout.addWidget(self.download_on_play_toggle_button)
+
+            self.main_layout.addItem(QtWidgets.QSpacerItem(0, 0, QtWidgets.QSizePolicy.Policy.Expanding))

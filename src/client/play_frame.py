@@ -1,3 +1,5 @@
+import os
+import tempfile
 from PySide6 import QtWidgets, QtGui, QtCore
 import settings
 from src.client.tools.style_setter import set_style_sheet
@@ -6,11 +8,15 @@ import pygame
 import eyed3
 from io import BytesIO
 from random import randint
+import requests
+import threading
+from src.client.tools.config_manager import ConfigManager
 
 
 class PlayFrame(QtWidgets.QFrame):
     play_button_state: int = 1
     active_track: eyed3.AudioFile = None
+    required_track_url: str = None
 
     def __init__(self) -> None:
         super(PlayFrame, self).__init__()
@@ -113,6 +119,40 @@ class PlayFrame(QtWidgets.QFrame):
         pygame.mixer.music.load(self.active_track.path)
         pygame.mixer.music.play()
 
+    def set_track_by_url(self, track_url: str) -> None:
+        self.required_track_url = track_url
+
+        threading.Thread(target=lambda: self.download_required_track(track_url)).start()
+
+    def download_required_track(self, track_url: str) -> None:
+        self.parent().track_info.load_indicator.show()
+        self.parent().track_info.track_image.hide()
+        self.parent().track_info.track_name.setText('Загрузка')
+
+        track = requests.get(track_url).content
+
+        if track_url != self.required_track_url or not threading.main_thread().is_alive():
+            exit()
+
+        temp_fd, temp_filename = tempfile.mkstemp(suffix=".mp3", prefix=settings.TEMPFILE_PREFIX)
+
+        with os.fdopen(temp_fd, "wb") as temp_file:
+            temp_file.write(track)
+
+        download_on_play: bool = ConfigManager.get_config()['download_on_play']
+
+        if download_on_play:
+            new_file_path: str = f'{ConfigManager.get_config()['music_dir']}/{track_url.split('/')[-1]}'
+            with open(new_file_path, 'wb') as audiofile:
+                audiofile.write(track)
+
+        loaded_track: eyed3.AudioFile = eyed3.load(temp_filename if not download_on_play else new_file_path)
+
+        self.parent().track_info.load_indicator.hide()
+        self.parent().track_info.track_image.show()
+
+        self.set_track(loaded_track)
+
     @staticmethod
     def play() -> None:
         pygame.mixer.music.unpause()
@@ -120,6 +160,11 @@ class PlayFrame(QtWidgets.QFrame):
     @staticmethod
     def pause() -> None:
         pygame.mixer.music.pause()
+
+    @staticmethod
+    def stop() -> None:
+        pygame.mixer.music.stop()
+        pygame.mixer.music.unload()
 
     def change_track(self, next_track: bool = True) -> None:
         if self.active_track is None:

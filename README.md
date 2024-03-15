@@ -10,17 +10,20 @@ Media player with Hitmo integration
 
 ## Tech
 
-| Lib            | PyPi                                    |
-|----------------|-----------------------------------------|
-| PySide6==6.6.1 | https://pypi.org/project/PySide6/6.6.1/ |
-| pygame==2.5.2  | https://pypi.org/project/pygame/2.5.2/  |
-| eyed3==0.9.7   | https://pypi.org/project/eyed3/0.9.7/   |
+| Lib                  | PyPi                                          |
+|----------------------|-----------------------------------------------|
+| PySide6==6.6.2       | https://pypi.org/project/PySide6/6.6.2/       |
+| pygame==2.5.2        | https://pypi.org/project/pygame/2.5.2/        |
+| eyed3==0.9.7         | https://pypi.org/project/eyed3/0.9.7/         |
+| requests==2.31.0     | https://pypi.org/project/requests/2.31.0/     |
+| pars_hitmotop==0.0.7 | https://pypi.org/project/pars_hitmotop/0.0.7/ |
 
 
 ## Features.
 - Playing tracks from a local folder.
 - Integration with hitmotop.com
 - Cross-platform.
+- Playing tracks without download
 
 ## Run
 
@@ -39,8 +42,5 @@ For start app
 ```shell
 python client.py
 ```
-
->The player is under development, many functions do not work, have not been added or do not work properly.
-
 
 [Python 3.12]: <https://www.python.org/downloads/release/python-3120/>
