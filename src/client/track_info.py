@@ -30,7 +30,7 @@ class TrackInfo(QtWidgets.QFrame):
 
         self.track_name.setText("Ничего не играет")
         self.track_image.setFixedSize(45, 45)
-        self.track_image.setPixmap(QtGui.QPixmap(f'{settings.CLIENT_DIR}/img/track.png'))
+        self.track_image.setPixmap(QtGui.QPixmap(f':/img/track.png'))
         self.track_image.setScaledContents(True)
         self.track_name.setContentsMargins(10, 0, 0, 0)
 

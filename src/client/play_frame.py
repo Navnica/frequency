@@ -65,12 +65,12 @@ class PlayFrame(QtWidgets.QFrame):
         self.play_button.setFixedSize(35, 35)
         self.back_button.setFixedSize(30, 30)
         self.next_button.setFixedSize(30, 30)
-        self.play_button.setIcon(QtGui.QPixmap(f'{settings.CLIENT_DIR}/img/play.png'))
+        self.play_button.setIcon(QtGui.QPixmap(f':/img/play.png'))
         self.play_button.setIconSize(self.play_button.size())
-        self.next_button.setIcon(QtGui.QPixmap(f'{settings.CLIENT_DIR}/img/next.png'))
+        self.next_button.setIcon(QtGui.QPixmap(f':/img/next.png'))
         self.next_button.setIconSize(self.next_button.size())
         self.back_button.setIcon(
-            QtGui.QPixmap(f'{settings.CLIENT_DIR}/img/next.png').transformed(QtGui.QTransform().scale(-1, 1))
+            QtGui.QPixmap(f':/img/next.png').transformed(QtGui.QTransform().scale(-1, 1))
         )
         self.back_button.setIconSize(self.back_button.size())
         self.current_time_label.setText('00:00')
@@ -101,7 +101,7 @@ class PlayFrame(QtWidgets.QFrame):
             pixmap: QtGui.QPixmap = QtGui.QPixmap()
             pixmap.loadFromData(BytesIO(track.tag.images[0].image_data).getvalue())
         else:
-            pixmap: QtGui.QPixmap = QtGui.QPixmap(f'{settings.CLIENT_DIR}/img/track.png')
+            pixmap: QtGui.QPixmap = QtGui.QPixmap(f':/img/track.png')
 
         self.parent().track_info.set_track_info(self.active_track, pixmap)
         self.duration_bar.start_pos = 0
@@ -199,7 +199,7 @@ class PlayFrame(QtWidgets.QFrame):
     def toggle_play_button(self) -> None:
         self.play_button_state = not self.play_button_state
         state: str = 'play' if self.play_button_state else 'pause'
-        self.play_button.setIcon(QtGui.QPixmap(f'{settings.CLIENT_DIR}/img/{state}.png'))
+        self.play_button.setIcon(QtGui.QPixmap(f':/img/{state}.png'))
 
     def pressed_next_or_back_button(self) -> None:
         self.toggle_next_or_back_button(1)
@@ -216,7 +216,7 @@ class PlayFrame(QtWidgets.QFrame):
         self.toggle_next_or_back_button(0)
 
     def toggle_next_or_back_button(self, state: int) -> None:
-        icon_path: str = f'{settings.CLIENT_DIR}/img/next{"_pressed" if state else ""}.png'
+        icon_path: str = f':/img/next{"_pressed" if state else ""}.png'
         icon = QtGui.QPixmap(icon_path)
 
         if self.sender().objectName() == 'BackButton':

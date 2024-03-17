@@ -3,3 +3,6 @@ __pycache__
 .git
 venv
 /src/client/config.json
+build
+dist
+client.spec

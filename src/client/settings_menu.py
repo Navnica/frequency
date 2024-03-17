@@ -86,7 +86,7 @@ class SettingsMenu(AnimatedPanel):
         def __init__(self) -> None:
             super(SettingsMenu.GeneralSettings, self).__init__(
                 title='Главное',
-                pixmap_path=f'{settings.CLIENT_DIR}/img/settings_title.png'
+                pixmap_path=f':/img/settings_title.png'
             )
             self.__init_ui()
 
@@ -119,7 +119,7 @@ class SettingsMenu(AnimatedPanel):
         def __init__(self) -> None:
             super(SettingsMenu.HitmoSettings, self).__init__(
                 title='Hitmo-интеграция',
-                pixmap_path=f'{settings.CLIENT_DIR}/img/hitmo_title.png'
+                pixmap_path=f':/img/hitmo_title.png'
             )
             self.__init_ui()
 

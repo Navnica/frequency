@@ -6,10 +6,10 @@ from src.client.tools.style_setter import set_style_sheet
 from src.client.tools.config_manager import ConfigManager
 from src.client.animated_panel import AnimatedPanel
 from src.client.tools.track_loader import get_tracks_in_music_dir
+from src.client.tools.hitmo_parser import find_tracks
 from io import BytesIO
 from src.client.toggle_button import ToggleButton
 import threading
-from pars_hitmotop.entered_tracks import EnteredTrack, NoFoundTrack
 import os
 import tempfile
 from src.client.load_indicator import LoadIndicator
@@ -76,7 +76,9 @@ class PlayListMenu(AnimatedPanel):
         button.clicked.connect(self.set_music_dir)
         button.setObjectName('ToSettingsButton')
         button.setMinimumSize(250, 30)
-        self.main_layout.addItem(QtWidgets.QSpacerItem(0, self.width()//2 + 40, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding))
+        self.main_layout.addItem(
+            QtWidgets.QSpacerItem(0, self.width() // 2 + 40, QtWidgets.QSizePolicy.Policy.Expanding,
+                                  QtWidgets.QSizePolicy.Policy.Expanding))
 
     def reload(self, only_clear: bool = False) -> None:
         layout = self.main_layout
@@ -159,7 +161,7 @@ class PlayListMenu(AnimatedPanel):
             self.setLayout(self.main_layout)
 
             self.search_button: QtWidgets.QPushButton = QtWidgets.QPushButton()
-            self.search_button.setIcon(QtGui.QPixmap(f'{settings.CLIENT_DIR}/img/search.png'))
+            self.search_button.setIcon(QtGui.QPixmap(f':/img/search.png'))
             self.search_button.enterEvent = self.mouse_enter_event
             self.search_button.leaveEvent = self.mouse_leave_event
 
@@ -257,19 +259,19 @@ class PlayListMenu(AnimatedPanel):
             threading.Thread(target=lambda: self.find_tracks_in_hitmo(self.required_track)).start()
 
         def find_tracks_in_hitmo(self, track_title: str) -> None:
-            try:
-                result: dict[str, str] = EnteredTrack(track_title, 30).get_info['items']
+            result: list[dict[str, str]] = find_tracks(track_title)
 
-                for track in result:
-                    if self.required_track != track_title or not threading.main_thread().is_alive():
-                        exit()
+            for track in result:
+                if self.required_track != track_title or not threading.main_thread().is_alive():
+                    exit()
 
-                    audio_picture = requests.get(track['picture_url']).content
-                    temp_fd, temp_filename = tempfile.mkstemp(suffix=".png", prefix=settings.TEMPFILE_PREFIX)
+                audio_picture = requests.get(track['picture_url']).content
+                temp_fd, temp_filename = tempfile.mkstemp(suffix=".png", prefix=settings.TEMPFILE_PREFIX)
 
-                    with os.fdopen(temp_fd, "wb") as temp_file:
-                        temp_file.write(audio_picture)
+                with os.fdopen(temp_fd, "wb") as temp_file:
+                    temp_file.write(audio_picture)
 
+                try:
                     self.track_added_signal.emit([
                         track['title'],
                         track['author'],
@@ -277,18 +279,15 @@ class PlayListMenu(AnimatedPanel):
                         temp_filename,
                         track['url_down']
                     ])
+                except RuntimeError:
+                    exit()
 
+            try:
                 for track in self.parent().tracks:
                     if isinstance(track, LoadIndicator):
                         track.close()
-
             except RuntimeError:
                 exit()
-
-            except NoFoundTrack:
-                for track in self.parent().tracks:
-                    if isinstance(track, LoadIndicator):
-                        track.close()
 
         def on_search_line_edit_changed(self) -> None:
             self.edit_timer.stop()
@@ -340,7 +339,7 @@ class PlayListMenu(AnimatedPanel):
         title: str = 'Unknown'
         artist: str = 'Unknown'
         album: str = 'Unknown'
-        pixmap_path: str = f'{settings.CLIENT_DIR}/img/track.png'
+        pixmap_path: str = f':/img/track.png'
         track_url: str = None
 
         def __init__(self,
@@ -348,7 +347,7 @@ class PlayListMenu(AnimatedPanel):
                      title: str = 'Unknown',
                      artist: str = 'Unknown',
                      album: str = 'Unknown',
-                     pixmap_path: str = f'{settings.CLIENT_DIR}/img/track.png',
+                     pixmap_path: str = f':/img/track.png',
                      track_url: str = None
                      ) -> None:
             super(PlayListMenu.TrackFrame, self).__init__()

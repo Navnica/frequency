@@ -2,6 +2,7 @@ from PySide6 import QtWidgets, QtCore, QtGui
 from src.client.tools.style_setter import set_style_sheet
 import settings
 from typing import Callable
+import src.client.resources_rc
 
 
 class SideMenu(QtWidgets.QFrame):
@@ -33,7 +34,7 @@ class SideMenu(QtWidgets.QFrame):
         sender: SideButton = self.sender() if sender is None else sender
         sender.state = not sender.state
         sender.setIcon(
-            QtGui.QPixmap(f'{settings.CLIENT_DIR}img/{sender.pixmap_name}{"_pressed" if sender.state else ""}.png')
+            QtGui.QPixmap(f':/img/{sender.pixmap_name}{"_pressed" if sender.state else ""}.png')
         )
 
     def on_repeat_click(self) -> None:
@@ -89,7 +90,7 @@ class SideButton(QtWidgets.QPushButton):
 
         self.pixmap_name = pixmap_name
         self.setFixedSize(size)
-        self.setIcon(QtGui.QPixmap(f'{settings.CLIENT_DIR}img/{pixmap_name}.png'))
+        self.setIcon(QtGui.QPixmap(f':/img/{pixmap_name}.png'))
         self.setIconSize(size)
         self.icon_name = pixmap_name
         self.clicked.connect(f) if f else None

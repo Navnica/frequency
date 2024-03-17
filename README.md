@@ -10,13 +10,13 @@ Media player with Hitmo integration
 
 ## Tech
 
-| Lib                  | PyPi                                          |
-|----------------------|-----------------------------------------------|
-| PySide6==6.6.2       | https://pypi.org/project/PySide6/6.6.2/       |
-| pygame==2.5.2        | https://pypi.org/project/pygame/2.5.2/        |
-| eyed3==0.9.7         | https://pypi.org/project/eyed3/0.9.7/         |
-| requests==2.31.0     | https://pypi.org/project/requests/2.31.0/     |
-| pars_hitmotop==0.0.7 | https://pypi.org/project/pars_hitmotop/0.0.7/ |
+| Lib              | PyPi                                      |
+|------------------|-------------------------------------------|
+| PySide6==6.6.2   | https://pypi.org/project/PySide6/6.6.2/   |
+| pygame==2.5.2    | https://pypi.org/project/pygame/2.5.2/    |
+| eyed3==0.9.7     | https://pypi.org/project/eyed3/0.9.7/     |
+| requests==2.31.0 | https://pypi.org/project/requests/2.31.0/ |
+| bs4==0.0.2       | https://pypi.org/project/bs4/0.0.2/       |
 
 
 ## Features.
