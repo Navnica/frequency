@@ -19,6 +19,7 @@
         <file>img/track.png</file>
         <file>img/up_pressed.png</file>
         <file>img/up.png</file>
+        <file>img/app_icon.ico</file>
 
         <file>style/main_window.qss</file>
         <file>style/play_frame.qss</file>

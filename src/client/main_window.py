@@ -1,7 +1,7 @@
 import os
 import settings
 import tempfile
-from PySide6 import QtWidgets, QtCore
+from PySide6 import QtWidgets, QtCore, QtGui
 from src.client.settings_menu import SettingsMenu
 from src.client.play_frame import PlayFrame
 from src.client.play_list_menu import PlayListMenu
@@ -20,6 +20,7 @@ class MainWindow(QtWidgets.QWidget):
         self.resize(350, 515)
         self.setMinimumWidth(250)
         self.setObjectName("MainWindow")
+        self.setWindowIcon(QtGui.QIcon(':/img/app_icon.ico'))
 
         set_style_sheet(self, 'main_window.qss')
 
